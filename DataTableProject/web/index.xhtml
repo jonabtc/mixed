@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <h:form id="formFiltrado">
+        <h:selectOneMenu id="sort" value="#{itemBean.filtrado}">
+            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+            <f:selectItems value="#{itemBean.filtroSelect}" var="filt"
+                           itemValue="#{filt.id}" itemLabel="#{filt.tipoFiltro}"/>
+            <f:ajax listener="#{itemBean.handlerFiltros}" process=":formFiltrado:sort" update=":productos:table"
+                    render=":productos:table"/>
+        </h:selectOneMenu>
+        <h:commandButton id="sortAscDesc" value="#{itemBean.sort()}">
+            <f:ajax listener="#{itemBean.cambiarSort}" process=":formFiltrado" update=":productos:table"
+                    render=":productos:table sortAscDesc"/>
+        </h:commandButton>
+    </h:form>
+</h:head>
+<h:body>
+    <h:form id="productos">
+        <h:dataTable id="table" value="#{itemBean.itemList}" binding="#{itemBean.dataTable}"
+                     rows="#{itemBean.rowsOnPage}"
+                     first="0" var="var" border="1">
+
+            <h:column>
+                <f:facet name="header">Number of Units to Purchase</f:facet>
+                <h:inputText id="pedido" value="#{var.pedido}">
+                    <f:convertNumber integerOnly="true"/>
+                    <f:ajax  update=":suma_total :productos:table:itemPrice :productos:table:pedido" render=":suma_total :productos:table:itemPrice :productos:table:pedido"/>
+                </h:inputText>
+                <h:message for="pedido" styleClass="errorMessage"/>
+            </h:column>
+
+            <h:column >
+                <f:facet name="header">Total Item Price</f:facet>
+                <h:outputText id="itemPrice" value="#{var.pedido div (1 div var.precio)}">
+                    <f:convertNumber currencySymbol="$" type="currency" pattern="$ 00.00"/>
+                </h:outputText>
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Serial Number</f:facet>
+                <h:outputText value="#{var.serial}"/>
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Product Name
+                    <h:inputText value="#{itemBean.filtradoName}">
+                        <f:ajax listener="#{itemBean.handlerFiltradoString}" update=":productos:table"
+                                render=":productos:table"/>
+                    </h:inputText>
+                </f:facet>
+                <h:outputText value="#{var.nombre}"/>
+
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Price per Unit
+                </f:facet>
+                <h:outputText value="#{var.precio}">
+                    <f:convertNumber currencySymbol="$" type="currency" pattern="$ 00.00"/>
+                </h:outputText>
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Number of Units Currently In Stock</f:facet>
+                <h:outputText value="#{var.stock}"/>
+            </h:column>
+            <f:facet name="footer">
+                <h:outputText value="#{(itemBean.dataTable.first div itemBean.fullPageRow) + 1}">
+                    <f:converter converterId="javax.faces.Integer"/>
+                </h:outputText>
+                of
+                <h:outputText value="#{itemBean.totalPages}">
+                    <f:converter converterId="javax.faces.Integer"/>
+                </h:outputText>
+                <h:commandButton value="First Page" action="#{itemBean.goToFirstPage()}"
+                                 disabled="#{itemBean.dataTable.first eq 0}"/>
+                <h:commandButton value="Previous Page" action="#{itemBean.goToPreviousPage()}"
+                                 disabled="#{itemBean.dataTable.first eq 0}"/>
+                <h:commandButton value="Next Page" action="#{itemBean.goToNextPage()}"
+                                 disabled="#{itemBean.dataTable.first + itemBean.dataTable.rows ge itemBean.dataTable.rowCount}"/>
+                <h:commandButton value="Last Page" action="#{itemBean.goToLastPage()}"
+                                 disabled="#{itemBean.dataTable.first + itemBean.dataTable.rows ge itemBean.dataTable.rowCount}"/>
+            </f:facet>
+        </h:dataTable>
+    </h:form>
+    <h:panelGrid id="suma_total" columns="2">
+        <br>Total:</br>
+        <h:outputText value="#{itemBean.total}">
+            <f:convertNumber currencySymbol="$ "/>
+        </h:outputText>
+    </h:panelGrid>
+    <h:commandButton  value="COMPRAR" action="#{itemBean.comprar}">
+        <f:ajax process=":productos" listener="#{itemBean.validateComprar}" render=":prodComprar"/>
+    </h:commandButton>
+    <h:outputText id="prodComprar" value="#{itemBean.error}" rendered="#{itemBean.errorBool}" styleClass="errorMessage"/>
+
+</h:body>
+</html>

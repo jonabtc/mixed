@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="windowTitle">
+        ¡Bienvenido!
+    </ui:define>
+
+    <ui:define name="heading">
+        <h:outputFormat value="#{msg.headingPrincipal}">
+            <f:param value="#{userBean.nameSessionUser}"/>
+        </h:outputFormat>
+
+        <h:commandButton value="#{msg.logout}" action="index" immediate="true">
+            <f:ajax listener="#{userBean.userLogOut}"/>
+        </h:commandButton>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="muestraUsuarios">
+            <h:panelGrid columns="2">
+                <h:selectOneMenu classe="filtros" id="opcionFiltrado" value="#{userBean.userFiltro}">
+                    <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                    <f:selectItems value="#{userBean.filtrosSelect}" var="filtro" itemValue="#{filtro.id}" itemLabel="#{filtro.tipoFiltro}"/>
+                    <f:ajax listener="#{userBean.handlerFiltros}" process="muestraUsuarios:opcionFiltrado"
+                            update="muestraUsuarios:vistaFiltrado" render="muestraUsuarios:vistaFiltrado"/>
+                </h:selectOneMenu>
+
+                <h:selectOneListbox class="filtros" id="vistaFiltrado" value="#{userBean.userReceptorMensaje}" required="true">
+                    <f:selectItems value="#{userBean.temporalUsuarios}" var="user"
+                                   itemValue="#{user.idUsuario}" itemLabel="#{user.nombreUsuario}"/>
+                    <f:ajax listener="#{userBean.handlerReceptor}" process="muestraUsuarios:vistaFiltrado" render="mensajesForm:receptor"/>
+                </h:selectOneListbox>
+            </h:panelGrid>
+        </h:form>
+
+            <h:form id="mensajesForm">
+                <h:outputFormat id="receptor" value="#{msg.messageToName}" rendered="true">
+                    <f:param value="#{userBean.nombreReceptor}"/>
+                </h:outputFormat><br/>
+                <h:inputTextarea id="textareaMensajes" value="#{userBean.textMensaje}" cols="30" rows="10"
+                                 rendered="true" required="true" validator="#{userBean.validateMensaje}"/><br/>
+                <h:commandButton value="#{msg.enviarMensaje}" action="#{userBean.enviarMensaje}"/>
+                <h:message for="textareaMensajes" styleClass="errorMessage"/>
+            </h:form>
+
+        <h:form id="mensajes">
+            <h:commandButton value="VER MENSAJES" action="#{userBean.cambiarVisible}" immediate="true">
+                <f:ajax execute="mensajes" render="mensajes"/>
+            </h:commandButton>
+
+            <br/>
+            <h:panelGrid columns="3">
+                <h:inputText id="eliminar" rendered="#{userBean.visualizarMensajes}" value="#{userBean.idMensajeBorrar}"
+                             validator="#{userBean.validateBorrarMensaje}">
+                    <f:validateLongRange minimum="1"/>
+                    <f:ajax execute="mensajes:eliminar" render="mensajes"/>
+                </h:inputText>
+                <h:commandButton value="BORRAR" rendered="#{userBean.visualizarMensajes}"
+                                 action="#{userBean.eliminarMensaje}"/>
+                <h:message for="eliminar" styleClass="errorMessage" rendered="#{userBean.visualizarMensajes}"/>
+            </h:panelGrid>
+            <br/>
+            <h:dataTable rendered="#{userBean.visualizarMensajes}" value="#{userBean.mensajesRecibidos}" var="o">
+                <h:column>
+                    <f:facet name="header">ID</f:facet>
+                    #{o.idMensaje}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Fecha</f:facet>
+                    #{o.fechaMensaje}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Emisor</f:facet>
+                    #{o.emisorMensaje}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Mensaje</f:facet>
+                    #{o.mensaje}
+                </h:column>
+            </h:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
+</html>

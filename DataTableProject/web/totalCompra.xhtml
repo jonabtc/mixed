@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:body>
+    <h:dataTable value="#{itemBean.comprado}" var="cmpr" border="1">
+
+        <h:column>
+            <f:facet name="header">Serial Number</f:facet>
+            <h:outputText value="#{cmpr.serial}"/>
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Product Name</f:facet>
+            <h:outputText value="#{cmpr.nombre}"/>
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Price per Unit</f:facet>
+            <h:outputText value="#{cmpr.precio}">
+                <f:convertNumber currencySymbol="$" type="currency" pattern="$ 00.00"/>
+            </h:outputText>
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Number of Units Currently In Stock</f:facet>
+            <h:outputText value="#{cmpr.stock}"/>
+        </h:column>
+
+    </h:dataTable>
+    <h:panelGrid id="suma_total" columns="2">
+        <br>Total:</br>
+        <h:outputText value="#{itemBean.totalComprado}">
+            <f:convertNumber currencySymbol="$ "/>
+        </h:outputText>
+    </h:panelGrid>
+</h:body>
+</html>

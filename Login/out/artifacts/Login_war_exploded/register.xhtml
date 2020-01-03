@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="windowTitle">
+        #{msg.registerTitle}
+    </ui:define>
+    <ui:define name="heading">
+        #{msg.headingRegister}
+    </ui:define>
+    <ui:define name="content">
+    <h:form>
+        <h:panelGrid columns="3">
+            #{msg.namePrompt}
+            <h:inputText id="name" style="text-transform:uppercase" value="#{userBean.registerName}"
+                         required="true" requiredMessage="#{msg.nameRequired}" validator="#{userBean.validateRegister}"/>
+            <h:message for="name" styleClass="errorMessage"/>
+        </h:panelGrid>
+        <p>
+            <h:commandButton value="#{msg.registerSave}" action="index"/>
+            <h:commandButton value="#{msg.registerCancel}" action="cancel" immediate="true"/>
+        </p>
+    </h:form>
+    </ui:define>
+</ui:composition>
+</html>
